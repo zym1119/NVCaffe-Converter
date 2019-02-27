@@ -13,7 +13,7 @@ def check_args(args):
     if not path.isfile(args.model):
         print('Model file ' + args.model + 'doesn\'t exist.')
         exit(-1)
-    if not path.isfile(args.weights) and not args.prototxt_only:
+    if args.weights != '' and not path.isfile(args.weights):
         print('Weights file ' + args.weights + 'doesn\'t exist.')
         exit(-1)
     if args.save_dir == '':
@@ -203,13 +203,14 @@ def generate_merged_weights(src_model, src_weights, dst_model, dst_weights):
 #######################
 def main(args):
     check_args(args)
+    prototxt_only = args.weights == ''
     
     if args.convert:
         bvlc_model, bvlc_weights = generate_save_path(args, 'bvlc')
         nv_bn_names = generate_bvlc_prototxt(args.model, bvlc_model)
         print('\n================ Converting complete successfully. ===============')
         print('Save bvlc model (.prototxt) into: ' + bvlc_model)
-        if not args.prototxt_only:
+        if not prototxt_only:
             generate_bvlc_weights(src_model, src_weights, bvlc_model, bvlc_weights, nv_bn_names)
             print('Save bvlc weights (.caffemodel) into: ' + bvlc_weights)
         print('================              Done.                ===============\n')
@@ -221,7 +222,7 @@ def main(args):
         generate_merged_prototxt(src_model, merged_model)
         print('\n================ BN merging complete successfully. ===============')
         print('Save merged model (.prototxt) into: ' + merged_model)
-        if not args.prototxt_only:
+        if not prototxt_only:
             generate_merged_weights(src_model, src_weights, merged_model, merged_weights)
             print('Save merged weights (.caffemodel) into: ' + merged_weights)
         print('================              Done.                ===============\n')
@@ -231,7 +232,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Model convertor. Both save NVCaffe model and weights to BVLC format and merge BN layer')
     parser.add_argument('--model', type=str, default='', help='The perseus-caffe model *.prototxt.')
     parser.add_argument('--weights', type=str, default='', help='The perseus-caffe weights *.caffemodel.')
-    parser.add_argument('--prototxt_only', type=bool, default=False, help='Only convert the prototxt.')
+    # parser.add_argument('--prototxt_only', type=bool, default=False, help='Only convert the prototxt.')
     parser.add_argument('--convert', type=bool, default=True, help='Convert NVCaffe model and weights to BVLC format')
     parser.add_argument('--merge_bn', type=bool, default=True, help='Merge BN layer into convolution.')
     parser.add_argument('--save_dir', type=str, default='', help='The directory to store the output.')
