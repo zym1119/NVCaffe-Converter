@@ -1,5 +1,6 @@
 from __future__ import print_function
 import caffe  # NVCaffe
+import numpy as np
 from os import path, getcwd
 from caffe.proto import caffe_pb2
 from argparse import ArgumentParser
@@ -11,10 +12,10 @@ import google.protobuf.text_format as txtf
 #########################
 def check_args(args):
     if not path.isfile(args.model):
-        print('Model file ' + args.model + 'doesn\'t exist.')
+        print('Model file ' + args.model + ' doesn\'t exist.')
         exit(-1)
     if args.weights != '' and not path.isfile(args.weights):
-        print('Weights file ' + args.weights + 'doesn\'t exist.')
+        print('Weights file ' + args.weights + ' doesn\'t exist.')
         exit(-1)
     if args.save_dir == '':
         args.save_dir = getcwd()
@@ -211,7 +212,7 @@ def main(args):
         print('\n================ Converting complete successfully. ===============')
         print('Save bvlc model (.prototxt) into: ' + bvlc_model)
         if not prototxt_only:
-            generate_bvlc_weights(src_model, src_weights, bvlc_model, bvlc_weights, nv_bn_names)
+            generate_bvlc_weights(args.model, args.weights, bvlc_model, bvlc_weights, nv_bn_names)
             print('Save bvlc weights (.caffemodel) into: ' + bvlc_weights)
         print('================              Done.                ===============\n')
     
